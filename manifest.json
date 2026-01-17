@@ -1,0 +1,15 @@
+{
+  "name": "Unit Cost Pro",
+  "short_name": "Calc Pro",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5359/5359190.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

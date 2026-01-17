@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Cost Pro</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" id="meta-theme" content="#070b14">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --bg-dark: #070b14; --bg-light: #ffffff; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease; }
+        body.dark { background-color: var(--bg-dark); color: #f8fafc; }
+        body.light { background-color: var(--bg-light); color: #0f172a; }
+        
+        .switch-btn { width: 50px; height: 26px; background: #334155; border-radius: 50px; position: relative; cursor: pointer; }
+        .light .switch-btn { background: #3b82f6; }
+        .switch-dot { width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 4px; left: 4px; transition: 0.3s transform cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .light .switch-dot { transform: translateX(24px); }
+
+        .app-container { width: 100%; max-width: 480px; padding: 20px; }
+        
+        input { transition: all 0.2s; border: 2px solid transparent !important; font-size: 1.125rem; font-weight: 600; }
+        .dark input { background: #111827; color: white; border-color: #1f2937 !important; }
+        .light input { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1 !important; }
+        input:focus { border-color: #3b82f6 !important; background: transparent !important; outline: none; }
+
+        .glass-card { border-radius: 2.5rem; padding: 2.5rem; transition: all 0.3s ease; }
+        .dark .glass-card { background: #111827; border: 1px solid #1f2937; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
+        .light .glass-card { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+
+        .log-toggle { font-size: 10px; font-weight: 900; letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .log-checkbox { width: 34px; height: 18px; background: #334155; border-radius: 20px; position: relative; transition: 0.3s; }
+        .log-checkbox::before { content: ""; position: absolute; width: 12px; height: 12px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: 0.3s; }
+        input:checked + .log-checkbox { background: #10b981; }
+        input:checked + .log-checkbox::before { transform: translateX(16px); }
+    </style>
+</head>
+<body class="dark">
+
+    <div class="app-container">
+        <div class="flex justify-between items-center mb-6 px-2">
+            <h1 class="text-xl font-extrabold tracking-tight text-blue-500">CALC.</h1>
+            <div class="flex items-center gap-3" onclick="toggleTheme()" style="cursor: pointer;">
+                <svg id="theme-icon" class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path id="svg-path" d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                </svg>
+                <div class="switch-btn"><div class="switch-dot"></div></div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2 ml-1">Total Product Price</label>
+                    <input type="text" id="price" placeholder="0.00" class="w-full rounded-2xl p-4">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2 ml-1">Quantity</label>
+                        <input type="text" id="qty" placeholder="0" class="w-full rounded-2xl p-4">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2 ml-1">Weight (kg)</label>
+                        <input type="text" id="weight" placeholder="0.0" class="w-full rounded-2xl p-4">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2 ml-1">CN Domestic Fee</label>
+                        <input type="text" id="domestic" placeholder="0.00" class="w-full rounded-2xl p-4">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2 ml-1">Weight Charge</label>
+                        <input type="text" id="wcpkg" placeholder="Rate" class="w-full rounded-2xl p-4">
+                    </div>
+                </div>
+
+                <label class="log-toggle mt-4 opacity-70 hover:opacity-100 transition-opacity">
+                    <input type="checkbox" id="showLog" class="hidden" checked>
+                    <div class="log-checkbox"></div>
+                    SHOW CALCULATION PROCESS
+                </label>
+
+                <button onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-3xl shadow-lg active:scale-[0.96] transition-all uppercase tracking-widest">
+                    Calculate Now
+                </button>
+
+                <div id="result-container" class="hidden mt-6 space-y-4">
+                    <div class="p-6 rounded-3xl bg-blue-600/10 border-2 border-blue-500/20 text-center">
+                        <p class="text-blue-500 text-[10px] font-black uppercase mb-1 tracking-[0.2em]">Final Cost Per Unit</p>
+                        <div id="result" class="text-5xl font-extrabold tracking-tighter text-blue-600 dark:text-blue-400">0.00</div>
+                    </div>
+                    <div id="log-container" class="hidden p-5 rounded-2xl bg-slate-800/50 dark:bg-black/40 border border-white/5 font-mono text-[11px] leading-relaxed text-blue-300/80"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi.hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGV2ID0+IGV2KTs=');
+        }
+
+        function solveMath(input) {
+            try {
+                const cleanInput = input.replace(/[^-()\d/*+.]/g, '');
+                return Function('"use strict";return (' + cleanInput + ')')() || 0;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark'); body.classList.toggle('light');
+            const isDark = body.classList.contains('dark');
+            const svgPath = document.getElementById('svg-path');
+            if (isDark) {
+                svgPath.setAttribute('d', 'M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z');
+                document.getElementById('meta-theme').setAttribute('content', '#070b14');
+            } else {
+                svgPath.setAttribute('d', 'M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z');
+                document.getElementById('meta-theme').setAttribute('content', '#ffffff');
+            }
+        }
+
+        function calculate() {
+            const priceVal = document.getElementById('price').value;
+            const price = solveMath(priceVal);
+            const qty = solveMath(document.getElementById('qty').value) || 1;
+            const weight = solveMath(document.getElementById('weight').value);
+            const domestic = solveMath(document.getElementById('domestic').value);
+            const wcpkg = solveMath(document.getElementById('wcpkg').value);
+
+            const weightChargeTotal = wcpkg * qty * weight;
+            const subtotal = weightChargeTotal + price + domestic + 80;
+            const final = subtotal / qty;
+
+            document.getElementById('result-container').classList.remove('hidden');
+            document.getElementById('result').innerText = final.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            const logBox = document.getElementById('log-container');
+            if (document.getElementById('showLog').checked) {
+                logBox.classList.remove('hidden');
+                logBox.innerHTML = `
+                    <div class="mb-1 text-white font-bold tracking-widest text-[9px]">CALCULATION LOG:</div>
+                    1. Price Check: ${priceVal.includes('*') || priceVal.includes('/') ? priceVal + ' = ' : ''}<span class="text-white">${price.toFixed(2)}</span><br>
+                    2. Weight Charge: ${wcpkg} × ${qty}qty × ${weight}kg = <span class="text-white">${weightChargeTotal.toFixed(2)}</span><br>
+                    3. Subtotal: ${weightChargeTotal.toFixed(2)} + ${price} + ${domestic} + 80 = <span class="text-white">${subtotal.toFixed(2)}</span><br>
+                    4. Final Cost: ${subtotal.toFixed(2)} / ${qty}qty = <span class="text-emerald-400 font-bold">${final.toFixed(2)}</span>
+                `;
+            } else {
+                logBox.classList.add('hidden');
+            }
+
+            if (window.navigator.vibrate) window.navigator.vibrate(40);
+        }
+    </script>
+</body>
+</html>
