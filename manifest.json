@@ -1,15 +1,16 @@
 {
   "name": "Unit Cost Pro",
   "short_name": "Calc Pro",
-  "start_url": ".",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#070b14",
   "theme_color": "#070b14",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/5359/5359190.png",
+      "src": "https://raw.githubusercontent.com/Tawhid-exe/costCalcTool/main/IMG_SEGMENT_20260117_181821.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
